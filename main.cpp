@@ -19,7 +19,6 @@ int main() {
     string path;
 
     bool mapReceived;
-
     bool mouseClicked;
 
     while (!mapReceived) {
@@ -30,7 +29,7 @@ int main() {
             continue;
         }
         else {
-            mapfile.open(path, std::ios::out | std::ios::binary );
+            mapfile.open(path, ios::out | ios::binary );
             if (!mapfile.fail()) {
                 mapfile.read((char*)&MAP, sizeof(MAP));
                 mapfile.close();
@@ -48,7 +47,7 @@ int main() {
 
 
     for (const auto & entry : filesystem::directory_iterator("../sprites")) {
-        textures.insert(textures.begin(), sf::Texture());
+        textures.insert(textures.begin(), Texture());
         textures[0].loadFromFile(entry.path());
     }
     int texturesCount = textures.size();
@@ -71,17 +70,17 @@ int main() {
                 float zoom = TILE_SIZE / (HEIGHT / TILES);
 
                 mainGrid.setSize(WIDTH * 0.75, HEIGHT);
-                mainGrid.setViewport(sf::FloatRect(0,0,0.75,1));
+                mainGrid.setViewport(FloatRect(0,0,0.75,1));
                 mainGrid.setCenter(WIDTH / 2 * zoom * 0.75 , HEIGHT / 2 * zoom);
                 mainGrid.zoom(zoom);
 
                 toolsGrid.setSize(WIDTH * 0.25, HEIGHT);
-                toolsGrid.setViewport(sf::FloatRect(0.75,0,0.25,1));
+                toolsGrid.setViewport(FloatRect(0.75,0,0.25,1));
                 toolsGrid.setCenter((WIDTH / 2) * zoom * 0.25, HEIGHT / 2 * zoom);
                 toolsGrid.zoom(zoom);
             }
 
-            if (event.type == sf::Event::MouseButtonPressed || (event.type == sf::Event::MouseMoved && mouseClicked)) {
+            if (event.type == Event::MouseButtonPressed || (event.type == Event::MouseMoved && mouseClicked)) {
                 mouseClicked = true;
                 Vector2i pixelPos = Mouse::getPosition(window);
                 if (pixelPos.x < WIDTH * 0.75) {
@@ -106,7 +105,7 @@ int main() {
                 if (event.key.code == Keyboard::S) {
                     ofstream mapfile;
                     cin >> path;
-                    mapfile.open(path, std::ios::out | std::ios::binary );
+                    mapfile.open(path, ios::out | ios::binary );
                     mapfile.write((char*)&MAP, sizeof(MAP));
                     mapfile.close();
                 }
@@ -135,7 +134,7 @@ int main() {
 
         for(int x = 0; x < 50; x++) {
             for(int y = 0; y < 40; y++){
-                sf::Sprite sprite;
+                Sprite sprite;
                 sprite.setTexture(textures[MAP[x][y][0]]);
                 sprite.setPosition( Vector2f(x * TILE_SIZE, y * TILE_SIZE));
                 window.draw(sprite);
@@ -145,7 +144,7 @@ int main() {
         window.setView(toolsGrid);
 
         RectangleShape back(Vector2f(WIDTH * 0.25, HEIGHT));
-        back.setFillColor(sf::Color(120,120,120));
+        back.setFillColor(Color(120,120,120));
         window.draw(back);
 
         for(int i = 0; i <= (int) WIDTH * 0.25 / TILE_SIZE; i++) {
@@ -164,7 +163,7 @@ int main() {
         }
 
         for(int i = 0; i < textures.size(); i++ ) {
-            sf::Sprite sprite;
+            Sprite sprite;
             sprite.setTexture(textures[i]);
             sprite.setPosition( Vector2f(i % (int) (WIDTH * 0.25 / (HEIGHT / TILES)) * TILE_SIZE,
                                          i / (int) (WIDTH * 0.25 / (HEIGHT / TILES)) * TILE_SIZE));
