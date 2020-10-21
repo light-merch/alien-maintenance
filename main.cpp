@@ -14,7 +14,7 @@ int TILE_SIZE = 32;
 int MAP[50][50][1];
 
 int main() {
-    vector<sf::Texture> textures;
+    vector<Texture> textures;
 
     string path;
 
@@ -22,14 +22,14 @@ int main() {
 
     bool mouseClicked;
 
-    while (!mapReceived){
-        std::ifstream mapfile;
+    while (!mapReceived) {
+        ifstream mapfile;
         cin >> path;
-        if (path == "-1"){
+        if (path == "-1") {
             mapReceived = true;
             continue;
         }
-        else{
+        else {
             mapfile.open(path, std::ios::out | std::ios::binary );
             if (!mapfile.fail()) {
                 mapfile.read((char*)&MAP, sizeof(MAP));
@@ -41,13 +41,13 @@ int main() {
     }
 
 
-    sf::View mainGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
-    sf::View toolsGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
+    View mainGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
+    View toolsGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
 
-    sf::RenderWindow window(VideoMode(WIDTH, HEIGHT), "Alien Maintenance");
+    RenderWindow window(VideoMode(WIDTH, HEIGHT), "Alien Maintenance");
 
 
-    for (const auto & entry : filesystem::directory_iterator("../sprites")){
+    for (const auto & entry : filesystem::directory_iterator("../sprites")) {
         textures.insert(textures.begin(), sf::Texture());
         textures[0].loadFromFile(entry.path());
     }
@@ -98,21 +98,19 @@ int main() {
                     }
                 }
             }
-            if (event.type == sf::Event::MouseButtonReleased){
+            if (event.type == Event::MouseButtonReleased) {
                 mouseClicked = false;
             }
-            if (event.type == sf::Event::KeyPressed)
+            if (event.type == Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::S)
-                {
-                    std::ofstream mapfile;
+                if (event.key.code == Keyboard::S) {
+                    ofstream mapfile;
                     cin >> path;
                     mapfile.open(path, std::ios::out | std::ios::binary );
                     mapfile.write((char*)&MAP, sizeof(MAP));
                     mapfile.close();
                 }
-                if (event.key.code == sf::Keyboard::Escape)
-                {
+                if (event.key.code == Keyboard::Escape) {
                     window.close();
                     return 0;
                 }
@@ -121,21 +119,21 @@ int main() {
 
         window.setView(mainGrid);
 
-        for(int i = 0; i <= 100; i++){
+        for(int i = 0; i <= 100; i++) {
             RectangleShape line(Vector2f(1, window.getSize().y));
             line.setPosition(Vector2f(i * TILE_SIZE, 0));
             line.setFillColor(Color::Black);
             window.draw(line);
         }
 
-        for(int i = 0; i <= 100; i++){
+        for(int i = 0; i <= 100; i++) {
             RectangleShape line(Vector2f(window.getSize().x, 1));
             line.setPosition(Vector2f(0, i * TILE_SIZE));
             line.setFillColor(Color::Black);
             window.draw(line);
         }
 
-        for(int x = 0; x < 50; x++){
+        for(int x = 0; x < 50; x++) {
             for(int y = 0; y < 40; y++){
                 sf::Sprite sprite;
                 sprite.setTexture(textures[MAP[x][y][0]]);
@@ -146,18 +144,18 @@ int main() {
 
         window.setView(toolsGrid);
 
-        sf::RectangleShape back(Vector2f(WIDTH * 0.25, HEIGHT));
+        RectangleShape back(Vector2f(WIDTH * 0.25, HEIGHT));
         back.setFillColor(sf::Color(120,120,120));
         window.draw(back);
 
-        for(int i = 0; i <= (int) WIDTH * 0.25 / TILE_SIZE; i++){
+        for(int i = 0; i <= (int) WIDTH * 0.25 / TILE_SIZE; i++) {
             RectangleShape line(Vector2f(1, WIDTH));
             line.setPosition(Vector2f(i * TILE_SIZE, 0));
             line.setFillColor(Color::White);
             window.draw(line);
         }
 
-        for(int i = 0; i <= 100; i++){
+        for(int i = 0; i <= 100; i++) {
             int lineWidth = (int) (WIDTH * 0.25 / (HEIGHT / TILES)) * TILE_SIZE;
             RectangleShape line(Vector2f(lineWidth, 1));
             line.setPosition(Vector2f(0, i * TILE_SIZE));
@@ -165,7 +163,7 @@ int main() {
             window.draw(line);
         }
 
-        for(int i = 0; i < textures.size(); i++ ){
+        for(int i = 0; i < textures.size(); i++ ) {
             sf::Sprite sprite;
             sprite.setTexture(textures[i]);
             sprite.setPosition( Vector2f(i % (int) (WIDTH * 0.25 / (HEIGHT / TILES)) * TILE_SIZE,
