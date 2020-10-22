@@ -17,9 +17,7 @@ int main() {
     vector<Texture> textures;
 
     string command, argument;
-
     bool mapReceived = false;
-    
     while (!mapReceived) {
         ifstream mapfile;
         cout << R"(type "new" to create new empty map, and "load" to load existing map)" << "\n";
@@ -104,19 +102,33 @@ int main() {
                     Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                     int blockX = (int) worldPos.x / TILE_SIZE;
                     int blockY = (int) worldPos.y / TILE_SIZE;
-//                    MAP[(int) worldPos.x / TILE_SIZE][(int) worldPos.y / TILE_SIZE][0] = textureIndex;
-                    cout << (event.key.code == Keyboard::LShift);
-                    if (shiftPressed && textureIndex != 0) {
-                        for (int i = 0; i < 4; i++) {
-                            if (MAP[blockX][blockY][i] == 0) {
-                                MAP[blockX][blockY][i] = textureIndex;
+                    if ( Mouse::isButtonPressed( Mouse::Left)) {
+                        if (shiftPressed && textureIndex != 0) {
+                            for (int i = 0; i < 4; i++) {
+                                if (MAP[blockX][blockY][i] == 0) {
+                                    MAP[blockX][blockY][i] = textureIndex;
+                                }
+                                if (MAP[blockX][blockY][i] == textureIndex) {
+                                    break;
+                                }
                             }
+                        } else {
+                            for (int i = 0; i < 4; i++) {
+                                MAP[blockX][blockY][i] = 0;
+                            }
+                            MAP[blockX][blockY][0] = textureIndex;
                         }
-                    } else {
+                    } else if ( Mouse::isButtonPressed( Mouse::Right)) {
                         for (int i = 0; i < 4; i++) {
                             MAP[blockX][blockY][i] = 0;
                         }
-                        MAP[blockX][blockY][0] = textureIndex;
+                    } else if (Mouse::isButtonPressed(Mouse::Middle)) {
+                        for (int i = 3; i >= 0; i--) {
+                            if (MAP[blockX][blockY][i] != 0) {
+                                textureIndex = MAP[blockX][blockY][i];
+                                break;
+                            }
+                        }
                     }
                 } else {
                     window.setView(toolsGrid);
@@ -145,12 +157,12 @@ int main() {
                     window.close();
                     return 0;
                 }
-                if (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift) {
+                if (event.key.code ==  Keyboard::LShift || event.key.code ==  Keyboard::RShift) {
                     shiftPressed = true;
                 }
             }
             if (event.type == Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift) {
+                if (event.key.code ==  Keyboard::LShift || event.key.code ==  Keyboard::RShift) {
                     shiftPressed = false;
                 }
             }
@@ -173,8 +185,8 @@ int main() {
         }
 
         for(int x = 0; x < 50; x++) {
-            for(int y = 0; y < 40; y++){
-                for(int t = 0; t < 4; t++){
+            for(int y = 0; y < 40; y++) {
+                for(int t = 0; t < 4; t++) {
                     Sprite sprite;
                     sprite.setTexture(textures[MAP[x][y][t]]);
                     sprite.setPosition( Vector2f(x * TILE_SIZE, y * TILE_SIZE));
