@@ -14,7 +14,7 @@ int TILE_SIZE = 32; // Tile size in viewport points
 int MAP[50][50][4]; // Map
 
 int menu{
-    3
+
 };
 
 int map{
@@ -53,8 +53,8 @@ int main() {
         }
     }
 
-    bool mouseClicked;
-    bool shiftPressed;
+    bool mouseClicked = false;
+    bool shiftPressed = false;
 
     View mainGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
     View toolsGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
@@ -65,7 +65,7 @@ int main() {
     for (const auto & entry : filesystem::directory_iterator("textures/sprites")) {
         if (entry.path() != "textures/sprites/empty.png") {
             textures.insert(textures.begin(), Texture());
-            textures[0].loadFromFile(entry.path());
+            textures[0].loadFromFile(entry.path().u8string());
         }
     }
 

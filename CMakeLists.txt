@@ -1,10 +1,36 @@
+# cmake_minimum_required(VERSION 3.17)
+# project(alien_maintenance)
+
+# set(CMAKE_CXX_STANDARD 17)
+
+# find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+
+# add_executable(alien_maintenance main.cpp)
+
+# target_link_libraries(alien_maintenance sfml-graphics sfml-audio)
+
 cmake_minimum_required(VERSION 3.17)
-project(alien_maintenance)
+project("Alien Maintenance")
 
-set(CMAKE_CXX_STANDARD 17)
 
-find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+if (UNIX)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../build)
+    include_directories("source")
+    find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+    add_executable(mapeditor source/main.cpp)
+    target_link_libraries(mapeditor sfml-graphics)
+endif (UNIX)
 
-add_executable(alien_maintenance main.cpp)
-
-target_link_libraries(alien_maintenance sfml-graphics sfml-audio)
+if (MSVC)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../build)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../build)
+    include_directories("source")
+    include_directories("C:\\SFML-2.5.1\\include")
+    find_library(SFMLGRAPHICS NAMES sfml-graphics.lib PATHS "C:\\SFML-2.5.1\\lib")
+    find_library(SFMLWINDOW NAMES sfml-window.lib PATHS "C:\\SFML-2.5.1\\lib")
+    find_library(SFMLSYSTEM NAMES sfml-system.lib PATHS "C:\\SFML-2.5.1\\lib")
+    add_executable(mapeditor source/main.cpp)
+    target_link_libraries(mapeditor ${SFMLGRAPHICS} ${SFMLWINDOW} ${SFMLSYSTEM})
+endif(MSVC)
