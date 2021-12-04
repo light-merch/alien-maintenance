@@ -2,6 +2,12 @@
 # Generate directories
 
 [ ! -d build ] && mkdir build
+
+# Move assets to build
+
+# FIXME: if don't work
+cp -r assets builds
+
 [ ! -d tmp ] && mkdir tmp
 
 # Go to directories

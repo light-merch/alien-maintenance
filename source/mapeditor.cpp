@@ -3,15 +3,18 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <textureorder.hpp>
 
 using namespace sf;
 using namespace std;
 
 int HEIGHT = 600, WIDTH = 800; // Default size of the window
-float TILES = 10; // Number of tiles (sprites) in a column
+float TILES = 32; // Number of tiles (sprites) in a column
 int TILE_SIZE = 32; // Tile size in viewport points
 
-int MAP[50][50][4]; // Map
+const int mapsizex = 100, mapsizey = 100;
+
+int MAP[mapsizex][mapsizey]; // Map
 
 int menu{
 
@@ -37,16 +40,18 @@ int main() {
         else if (command == "load") {
             cout << "name of map" << '\n';
             cin >> argument;
-            mapfile.open(argument, ios::out | ios::binary );
-            if (!mapfile.fail()) {
-                mapfile.read((char*)&MAP, sizeof(MAP));
-                mapfile.close();
-                mapReceived = true;
-                continue;
+            mapfile.open(argument, ios::out);
+            int d = 0;
+            mapfile >> d ;
+            mapfile >> d ;
+            for(int j = 0; j < mapsizey; j++) {
+                for(int i = 0; i < mapsizex; i++) {
+                    mapfile >> MAP[i][j];
+                }
             }
-            else{
-                cout << "error loading texture" << '\n';
-            }
+            mapfile.close();
+            mapReceived = true;
+            continue;
         }
         else {
             cout << "unknown command" << '\n';
@@ -59,25 +64,25 @@ int main() {
     View mainGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
     View toolsGrid(Vector2f(0, 0), Vector2f(WIDTH, HEIGHT));
 
-    RenderWindow window(VideoMode(WIDTH, HEIGHT), "Alien Maintenance");
+    RenderWindow window(VideoMode(WIDTH, HEIGHT), "Map Editor Dead");
 
-
-    for (const auto & entry : filesystem::directory_iterator("textures/sprites")) {
-        if (entry.path() != "textures/sprites/empty.png") {
-            textures.insert(textures.begin(), Texture());
-            textures[0].loadFromFile(entry.path().u8string());
-        }
+    std::string path = "./sprites/";
+    for (int i = 0; i < texturecount; i++) {
+        textures.insert(textures.end(), Texture());
+        textures[i].loadFromFile(path + order[i]);
     }
-
-    textures.insert(textures.begin(), Texture());
-    textures[0].loadFromFile("textures/sprites/empty.png");
 
     int texturesCount = textures.size();
 
     int textureIndex = 0;
-
+    std::cout << "started main loop\n";
+    int icjokdsadsada = 0;
+    sf::Clock clockS;
     while (window.isOpen()) {
         // Event handling
+        double lastframetime = clockS.getElapsedTime().asSeconds();
+        clockS.restart();
+        window.setTitle("FUCKS per second " + std::to_string(1.0 / lastframetime));
         Event event{};
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) {
@@ -110,34 +115,7 @@ int main() {
                     Vector2f worldPos = window.mapPixelToCoords(pixelPos);
                     int blockX = (int) worldPos.x / TILE_SIZE;
                     int blockY = (int) worldPos.y / TILE_SIZE;
-                    if ( Mouse::isButtonPressed( Mouse::Left)) {
-                        if (shiftPressed && textureIndex != 0) {
-                            for (int i = 0; i < 4; i++) {
-                                if (MAP[blockX][blockY][i] == 0) {
-                                    MAP[blockX][blockY][i] = textureIndex;
-                                }
-                                if (MAP[blockX][blockY][i] == textureIndex) {
-                                    break;
-                                }
-                            }
-                        } else {
-                            for (int i = 0; i < 4; i++) {
-                                MAP[blockX][blockY][i] = 0;
-                            }
-                            MAP[blockX][blockY][0] = textureIndex;
-                        }
-                    } else if ( Mouse::isButtonPressed( Mouse::Right)) {
-                        for (int i = 0; i < 4; i++) {
-                            MAP[blockX][blockY][i] = 0;
-                        }
-                    } else if (Mouse::isButtonPressed(Mouse::Middle)) {
-                        for (int i = 3; i >= 0; i--) {
-                            if (MAP[blockX][blockY][i] != 0) {
-                                textureIndex = MAP[blockX][blockY][i];
-                                break;
-                            }
-                        }
-                    }
+                    MAP[blockX][blockY] = textureIndex;
                 } else {
                     window.setView(toolsGrid);
                     Vector2f worldPos = window.mapPixelToCoords(pixelPos);
@@ -157,8 +135,15 @@ int main() {
                 if (event.key.code == Keyboard::S) {
                     ofstream mapfile;
                     cin >> argument;
-                    mapfile.open(argument, ios::out | ios::binary );
-                    mapfile.write((char*)&MAP, sizeof(MAP));
+                    mapfile.open(argument, ios::out);
+                    mapfile << mapsizex << '\n';
+                    mapfile << mapsizey << '\n';
+                    for(int j = 0; j < mapsizey; j++) {
+                        for(int i = 0; i < mapsizex; i++) {
+                            mapfile << MAP[i][j] << ' ';
+                        }
+                        mapfile << '\n';
+                    }
                     mapfile.close();
                 }
                 if (event.key.code == Keyboard::Escape) {
@@ -192,14 +177,12 @@ int main() {
             window.draw(line);
         }
 
-        for(int x = 0; x < 50; x++) {
-            for(int y = 0; y < 40; y++) {
-                for(int t = 0; t < 4; t++) {
-                    Sprite sprite;
-                    sprite.setTexture(textures[MAP[x][y][t]]);
-                    sprite.setPosition( Vector2f(x * TILE_SIZE, y * TILE_SIZE));
-                    window.draw(sprite);
-                }
+        for(int x = 0; x < mapsizex; x++) {
+            for(int y = 0; y < mapsizey; y++) {
+                Sprite sprite;
+                sprite.setTexture(textures[MAP[x][y]]);
+                sprite.setPosition( Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+                window.draw(sprite);
             }
         }
 
